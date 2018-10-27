@@ -91,4 +91,14 @@ for a guide on setting up a Windows development environment.
   > git remote add origin <copied link>
   ```
 
+6) Add files to track.
+  ```console
+  > git add .
+  ```
+
+7) Commit changes.
+  ```console
+  > git commit -m 'initial commit'
+  ```
+
 {% include disqus.html %}
