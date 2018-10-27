@@ -101,4 +101,16 @@ for a guide on setting up a Windows development environment.
   > git commit -m 'initial commit'
   ```
 
+8) Push to GitHub.
+  ```console
+  > git push origin master
+  ```
+
+## Enable GitHub Pages
+
+## Additional Resources
+- [Setting up GitHub Pages with Jekyll](http://www.stephaniehicks.com/githubPages_tutorial/pages/githubpages-jekyll.html)
+- [Secure and fast GitHub Pages with CloudFlare](https://blog.cloudflare.com/secure-and-fast-github-pages-with-cloudflare/)
+
+
 {% include disqus.html %}
