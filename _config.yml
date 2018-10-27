@@ -16,20 +16,24 @@
 title: Andrew C. Meier
 email: ameier@easury.com
 description: >- # this means to ignore newlines until "baseurl:"
-  Welcome! This this the personal blog of Andrew C. Meier. Originally
-  from STL, now living in NYC, and working in FinTech. Passionate about
-  consumer finance, capital markets, functional programming (especially F#!),
-  and DevOps.
+  Personal blog of Andrew C. Meier. Originally
+  from STL, now living in NYC. Working in FinTech. Passionate about
+  consumer finance, capital markets, functional programming, and DevOps.
 baseurl: "/"
 url: "https://andrewcmeier.com"
 twitter_username: ameier38
 github_username:  ameier38
+
+# Feed settings
+author:
+  twitter: ameier38
 
 # Build settings
 markdown: kramdown
 theme: minima
 plugins:
   - jekyll-feed
+  - jemoji
 
 # Exclude from processing.
 # The following items will not be processed, by default. Create a custom list
