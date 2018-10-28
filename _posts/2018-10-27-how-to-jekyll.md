@@ -88,10 +88,10 @@ and building platform for Windows.
 
 3. Create a new empty repository on GitHub. Navigate to 
 `github.com/{username}?tab=repositories` and click the 'New' button.
-   ![create-new-repository](/assets/images/how-to-jekyll/create-new-repository.png)
+   ![create-new-repository](/assets/images/how-to-jekyll/create-new-repository.png){:class="shadow"}
 
 4. Copy the repository link.
-   ![clone-repository](/assets/images/how-to-jekyll/clone-repository.png)
+   ![clone-repository](/assets/images/how-to-jekyll/clone-repository.png){:class="shadow"}
 
 5. Add the repository link as a remote.
    ```
@@ -119,10 +119,17 @@ and building platform for Windows.
 your web site from a GitHub repository.
 
 1. Go to the Settings tab for your repository.
-   ![github-select-page-rule](/assets/images/how-to-jekyll/github-select-settings.png)
+   ![github-select-page-rule](/assets/images/how-to-jekyll/github-select-settings.png){:class="shadow"}
 
 2. Scroll down to the GitHub Pages section and set the source to the `master` branch.
-   ![github-pages](/assets/images/how-to-jekyll/github-pages.png)
+   ![github-pages](/assets/images/how-to-jekyll/github-pages.png){:class="shadow"}
+
+3. Add 'github-pages' gem to your Gemfile.
+```ruby
+group :jekyll_plugins do
+  gem "github-pages"
+end
+```
 
 ## Using a custom domain name
 
@@ -134,19 +141,19 @@ for ~$30 and it renews at ~$20 a year.
 as the DNS provider so you can route traffic to your site securely using SSL.
 
 3. Add a site to your Cloudflare account.
-   ![cloudflare-add-site](/assets/images/how-to-jekyll/cloudflare-add-site.png)
+   ![cloudflare-add-site](/assets/images/how-to-jekyll/cloudflare-add-site.png){:class="shadow"}
 
 4. Get the Cloudflare nameservers for your site.
-   ![cloudflare-nameservers](/assets/images/how-to-jekyll/cloudflare-nameservers.png)
+   ![cloudflare-nameservers](/assets/images/how-to-jekyll/cloudflare-nameservers.png){:class="shadow"}
 
 5. Add the Cloudflare nameservers to Namecheap (or whatever registrar you use).
-   ![namecheap-custom-dns](/assets/images/how-to-jekyll/namecheap-custom-dns.png)
+   ![namecheap-custom-dns](/assets/images/how-to-jekyll/namecheap-custom-dns.png){:class="shadow"}
 
 6. Add CNAME records to Cloudflare. You will add one apex record
 (`andrewcmeier.com` in my case) and another `wwww` record (`www.andrewcmeier.com` in my case).
 Both of the values will be `{username}.github.io`. So for my site, the value is
 `ameier38.github.io`.
-   ![cloudflare-cname](/assets/images/how-to-jekyll/cloudflare-cname.png)
+   ![cloudflare-cname](/assets/images/how-to-jekyll/cloudflare-cname.png){:class="shadow"}
 
 7. Add a CNAME file in your repository. This is used to register the domain
 name with GitHub pages and point to the correct repository.
