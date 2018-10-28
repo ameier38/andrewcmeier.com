@@ -181,6 +181,19 @@ name with GitHub pages and point to the correct repository.
    > git commit -m 'added CNAME'
    ```
 
+8. Open the Page Rules dashboard and select 'Create Page Rule'.
+   ![cloudflare-select-page-rule](/assets/images/how-to-jekyll/cloudflare-select-page-rule.png)
+
+9. Add Page Rule to always use HTTPS.
+   ![cloudflare-page-rule-https](/assets/images/how-to-jekyll/cloudflare-page-rule-https.png)
+
+10. Add Page Rule to forward to the apex.
+   ![cloudflare-page-rule-forward-to-apex](/assets/images/how-to-jekyll/cloudflare-page-rule-forward-to-apex.png)
+
+Now your site is set up to use your custom domain name and you will [get a better SEO
+ranking with Google](https://webmasters.googleblog.com/2014/08/https-as-ranking-signal.html) 
+since you are using HTTPS :tada:.
+
 ## Create a post
 
 To create a post, we need to add a new markdown file into the `_posts` directory.
