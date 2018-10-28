@@ -116,7 +116,29 @@ and building platform for Windows.
 ## Host your site on GitHub pages
 
 [GitHub Pages](https://pages.github.com/) allows you to host
-your web site from a GitHub repository.
+your web site for free from a GitHub repository.
+
+1. Update the `Gemfile` to enable GitHub pages. You need to comment out `gem "jekyll"`
+and then uncomment the `gem "github-pages"`. The result should look like below.
+   ```ruby
+   # This will help ensure the proper Jekyll version is running.
+   # Happy Jekylling!
+   # gem "jekyll", "~> 3.8.4"
+
+   # This is the default theme for new Jekyll sites. You may change this to anything you like.
+   gem "minima", "~> 2.0"
+
+   # If you want to use GitHub Pages, remove the "gem "jekyll"" above and
+   # uncomment the line below. To upgrade, run `bundle update github-pages`.
+   gem "github-pages", group: :jekyll_plugins
+   ```
+
+2. Push your changes to GitHub.
+   ```
+   > git add Gemfile
+   > git commit -m "update Gemfile"
+   > git push origin master
+   ```
 
 1. Go to the Settings tab for your repository.
    ![github-select-page-rule](/assets/images/how-to-jekyll/github-select-settings.png){:class="shadow"}
@@ -124,12 +146,7 @@ your web site from a GitHub repository.
 2. Scroll down to the GitHub Pages section and set the source to the `master` branch.
    ![github-pages](/assets/images/how-to-jekyll/github-pages.png){:class="shadow"}
 
-3. Add 'github-pages' gem to your Gemfile.
-```ruby
-group :jekyll_plugins do
-  gem "github-pages"
-end
-```
+3. Navigate to `{your username}.github.io/{your repository}` and verify your site is working.
 
 ## Using a custom domain name
 
@@ -197,7 +214,7 @@ Then the rest of the file is your blog post content.
 Before pushing your changes to GitHub, you should check your site locally. Run
 the Jekyll site locally using the following command from the root of your repository.
 ```
-> jekyll serve
+> bundle exec jekyll serve
 ```
 
 Then navigate to your site at `http://localhost:4000`.
@@ -225,7 +242,7 @@ In this post we covered:
 
 All the code for this site is located on [my GitHub repo](https://github.com/ameier38/andrewcmeier.com)
 if you want to see more details. Let me know if you have any questions or find any issues in
-the comments below. Thanks!
+the comments below. Thanks! :smile:
 
 ## Additional Resources
 - [Jekyll Homepage](https://jekyllrb.com/)

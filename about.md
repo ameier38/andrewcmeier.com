@@ -4,7 +4,7 @@ title: About
 permalink: /about/
 ---
 
-Welcome! This this the personal blog of Andrew C. Meier. 
+:tada: Welcome! :tada: This this the personal blog of Andrew C. Meier. 
 Originally from STL, now living in NYC. 
 Working in FinTech [@MoneyLion](https://twitter.com/moneylion?lang=en). 
 Passionate about consumer finance, capital markets, 
