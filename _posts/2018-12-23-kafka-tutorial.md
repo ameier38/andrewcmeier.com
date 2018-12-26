@@ -110,7 +110,6 @@ Connect to the producer console.
 ```
 > kubectl exec -it kafka-0 bash 
 $ kafka-console-producer.sh --broker-list kafka:9092 --topic logging.tutorial.main
->
 ```
 
 Once the console launches you can type a message and press `Enter`.
@@ -127,7 +126,6 @@ Connect to the producer console.
 ```
 > kubectl exec -it kafka-0 bash 
 $ kafka-console-producer.sh --broker-list kafka:9092 --topic logging.tutorial.main --producer-property acks=all
->
 ```
 > Notice the additional `producer-property` argument. `acks=1` is the default which means
 the leader broker will acknowledge the message. `acks=all` means that the leader
@@ -154,7 +152,6 @@ Open a new terminal and connect to the producer console.
 ```
 > kubectl exec -it kafka-0 bash 
 $ kafka-console-producer.sh --broker-list kafka:9092 --topic logging.tutorial.main
->
 ```
 
 Write some messages in the producer console and you should see the messages
@@ -188,7 +185,6 @@ Open a new terminal and connect to the producer console.
 ```
 > kubectl exec -it kafka-0 bash 
 $ kafka-console-producer.sh --broker-list kafka:9092 --topic logging.tutorial.main
->
 ```
 
 Write some messages in the producer console and you should see the messages
@@ -206,7 +202,7 @@ In this post we covered:
 - [Created a topic](#create-a-topic)
 - [Produced messages](#produce-messages)
 - [Consumed messages](#consume-messages)
-- [Built F# produce and consumer](#tutorial-f)
+- [Built F# produce and consumer](#tutorial---f)
 
 Much thanks to the engineers at [Confluent](https://www.confluent.io/)
 and [Jet.com](https://github.com/jet) for all the work on the Kafka and F#

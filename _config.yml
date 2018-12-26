@@ -1,9 +1,6 @@
 # Site settings
 title: Andrew C. Meier
-description: >-
-  Notebook of Andrew C. Meier. Originally
-  from STL, now living in NYC. Working in FinTech. Passionate about
-  consumer finance, capital markets, functional programming, and DevOps.
+description: Made in the USA <img src='/assets/images/america.svg' />
 baseurl: "/"
 url: "https://andrewcmeier.com"
 twitter_username: ameier38
