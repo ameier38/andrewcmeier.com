@@ -210,7 +210,7 @@ In this post we covered:
 
 Much thanks to the engineers at [Confluent](https://www.confluent.io/)
 and [Jet.com](https://github.com/jet) for all the work on the Kafka and F#
-libraries :raised_hands:
+libraries :raised_hands:!
 
 ## Additional Resources
 - [Kafka homepage](https://kafka.apache.org/intro)
@@ -223,5 +223,3 @@ libraries :raised_hands:
 
 I hope you enjoyed the post. If you run into any issues setting up the project leave a
 comment and I can try to help debug :bug:.
-
-{% include disqus.html %}

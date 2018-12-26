@@ -262,5 +262,3 @@ the comments below. Thanks! :smile:
 - [Jekyll Homepage](https://jekyllrb.com/)
 - [Setting up GitHub Pages with Jekyll](http://www.stephaniehicks.com/githubPages_tutorial/pages/githubpages-jekyll.html)
 - [Secure and fast GitHub Pages with CloudFlare](https://blog.cloudflare.com/secure-and-fast-github-pages-with-cloudflare/)
-
-{% include disqus.html %}
