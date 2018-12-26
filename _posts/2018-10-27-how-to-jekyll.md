@@ -1,8 +1,9 @@
 ---
 layout: post
-title:  How to Jekyll
+title: How to Jekyll
+cover: /assets/images/how-to-jekyll/cover.png
 permalink: how-to-jekyll
-date:   2018-10-27 11:37:39 -0400
+date: 2018-10-27 11:37:39 -0400
 categories: 
   - jekyll
   - windows
