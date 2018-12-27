@@ -190,10 +190,55 @@ $ kafka-console-producer.sh --broker-list kafka:9092 --topic logging.tutorial.ma
 Write some messages in the producer console and you should see the messages
 evenly split between the two consumer consoles.
 
-## Tutorial - F#
+## Tutorial - <img src="/assets/images/i-heart-fsharp.png" alt="i-heart-fsharp" height="20px">
+In this section we will create a producer and consumer in F#.
 See the [source code](https://github.com/ameier38/kafka-beginners-course) for
-creating a producer and consumer using F# 
-(<img src="/assets/images/i-heart-fsharp.png" alt="i-heart-fsharp" height="20px">).
+for more details.
+
+Clone the repo
+```
+> git clone https://github.com/ameier38/kafka-beginners-course.git
+> cd kafka-beginners-course
+```
+
+Install dependencies.
+```
+> .paket/paket.exe install
+```
+> If you are using OSX or Linux you will need to install [Mono](https://www.mono-project.com/).
+
+Restore the project.
+```
+> dotnet restore
+```
+
+Compile the application.
+```
+> dotnet publish -o out
+```
+> This will compile the application and add the compiled assets into
+a directory called `out`.
+
+Start the consumer. We use telepresence to proxy the services locally.
+```
+> telepresence --run-shell --method inject-tcp
+> dotnet out/Tutorial.dll consumer kafka:9092 test_topic test_group
+```
+> This will start a consumer that will try to connect to a Kafka broker
+at `kafka:9092` listening on the topic `test_topic` within the group `test_group`.
+Using `telepresence` allows us to use the same DNS names in the Kubernetes
+cluster.
+
+Open a new terminal and start the producer.
+```
+> telepresence --run-shell --method inject-tcp
+> dotnet out/Tutorial.dll producer kafka:9092 test_topic test_key
+```
+> This will start a producer that will try to connect to a Kafka broker
+at `kafka:9092` producing to the topic `test_topic` using the key `test_key`.
+
+Enter messages into the producer terminal and you should see the messages
+appear in the consumer terminal.
 
 ## Summary
 In this post we covered:
@@ -202,7 +247,7 @@ In this post we covered:
 - [Created a topic](#create-a-topic)
 - [Produced messages](#produce-messages)
 - [Consumed messages](#consume-messages)
-- [Built F# produce and consumer](#tutorial---f)
+- [Built F# produce and consumer](#tutorial---)
 
 Much thanks to the engineers at [Confluent](https://www.confluent.io/)
 and [Jet.com](https://github.com/jet) for all the work on the Kafka and F#
