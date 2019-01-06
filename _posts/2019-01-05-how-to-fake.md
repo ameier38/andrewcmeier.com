@@ -235,7 +235,9 @@ Target.runOrDefault "Test"
 
 :sweat_smile: Hopefully that makes sense! FAKE is a really
 powerful tool and the above tutorial just scratches the surface.
-I encourage you to check out the resources below to learn more!
+I encourage you to read the resources below to learn more!
+If you want want see a working example check out my 
+[F# Utilities repo](https://github.com/ameier38/fsharp-utilities).
 
 ## Resources
 - [Getting started with FAKE](https://fake.build/fake-gettingstarted.html)
