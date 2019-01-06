@@ -6,6 +6,7 @@ permalink: kafka-tutorial
 date: 2018-12-23 12:00:00 -0400
 categories: 
   - kafka
+  - F#
 comments: true
 ---
 

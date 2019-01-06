@@ -12,4 +12,5 @@ functional programming (![i-heart-fsharp](/assets/images/i-heart-fsharp.png){:he
 and DevOps.
 
 If you like the site and want to build your own, check out
-the [How to Jekyll post](https://andrewcmeier.com/how-to-jekyll) :metal:.
+the [How to Jekyll post](https://andrewcmeier.com/how-to-jekyll)
+or the [source code](https://github.com/ameier38/andrewcmeier.com) :metal:.
