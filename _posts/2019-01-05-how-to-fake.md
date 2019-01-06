@@ -4,6 +4,7 @@ title:  How to FAKE
 cover: /assets/images/how-to-fake/cover.png
 permalink: how-to-fake
 date: 2019-01-05 12:08:00 -0400
+updated: 2019-01-06 08:06:00 -0400
 categories: 
   - F#
   - FAKE
@@ -123,9 +124,12 @@ Target.create "Install" (fun _ ->
     else
         Trace.trace "Paket already exists"
     Trace.trace "Installing dependencies"
-    match Shell.Exec (paketExe, "install") with
-    | 0 -> Trace.trace "Successfully installed dependencies"
-    | _ -> failwith "Failed to install dependencies")
+    Command.RawCommand(paketExe, Arguments.OfArgs ["install"])
+    |> CreateProcess.fromCommand
+    |> CreateProcess.withFramework
+    |> CreateProcess.ensureExitCode
+    |> Proc.run
+    |> ignore)
 
 Target.create "Test" (fun _ ->
     let (exitCode, messages) = 
@@ -136,12 +140,13 @@ Target.create "Test" (fun _ ->
             "test.fsx" 
             // script arguments
             []
-    let traceMessages = String.concat ";" >> Trace.trace
     match exitCode with
     | 0 -> 
-        traceMessages messages
+        messages
+        |> List.iter Trace.trace
     | _ -> 
-        traceMessages messages
+        messages
+        |> List.iter Trace.traceError
         failwith "Error!")
 
 open Fake.Core.TargetOperators
@@ -189,15 +194,18 @@ Target.create "Install" (fun _ ->
     else
         Trace.trace "Paket already exists"
     Trace.trace "Installing dependencies"
-    match Shell.Exec (paketExe, "install") with
-    | 0 -> Trace.trace "Successfully installed dependencies"
-    | _ -> failwith "Failed to install dependencies")
+    // run "paket.exe install"
+    Command.RawCommand(paketExe, Arguments.OfArgs ["install"])
+    |> CreateProcess.fromCommand
+    // use mono if linux
+    |> CreateProcess.withFramework
+    // throw an error if the process fails
+    |> CreateProcess.ensureExitCode
+    |> Proc.run
+    |> ignore)
 ```
-> The `Http` module is located in the `Fake.Net` library
-and the `Http.downloadFile` is a function which downloads a file
-from a specified address. The `Shell` module is located in 
-the `Fake.Core` library and the `Shell.Exec` function allows
-us to execute a command and returns the exit code.
+> Read more about running processes in FAKE 
+[here](https://fake.build/core-process.html).
 
 Next, we create a target which will run the `test.fsx` script.
 ```fsharp
