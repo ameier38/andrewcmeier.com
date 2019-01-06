@@ -4,6 +4,7 @@ title:  How to FAKE
 cover: /assets/images/how-to-fake/cover.png
 permalink: how-to-fake
 date: 2019-01-05 12:08:00 -0400
+updated: 2019-01-06 08:06:00 -0400
 categories: 
   - F#
   - FAKE
