@@ -289,8 +289,194 @@ let query : Query<LeaseId,LeaseEvent,'View> =
         |> AsyncResult.ofAsync
 ```
 
-You can see a full workflow in the `Tests/Tests.Lease.fs` file to show how we
-have handled each of the requirements.
+### Example Workflow
+In this section we will run through an example workflow to see the API in action.
+
+First create a new lease.
+```shell
+curl -X POST \
+  http://localhost:8080/lease \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "leaseId": "d290f1ee-6c54-4b01-90e6-d701748f0853",
+  "startDate": "2017-07-21Z",
+  "maturityDate": "2018-07-21Z",
+  "monthlyPaymentAmount": 25
+}'
+```
+```json
+{
+    "amountDue": 0,
+    "createdDate": "2019-03-04T16:52:54.6570655Z",
+    "events": [
+        {
+            "createdDate": "2019-03-04T16:52:54.6570655Z",
+            "effectiveDate": "2017-07-21T00:00:00+00:00",
+            "eventId": 0,
+            "eventType": "Created"
+        }
+    ],
+    "lease": {
+        "leaseId": "d290f1ee-6c54-4b01-90e6-d701748f0853",
+        "maturityDate": "2018-07-21T00:00:00+00:00",
+        "monthlyPaymentAmount": 25,
+        "startDate": "2017-07-21T00:00:00+00:00"
+    },
+    "status": "Outstanding",
+    "totalPaid": 0,
+    "totalScheduled": 0,
+    "updatedDate": "2019-03-04T16:52:54.6570655Z"
+}
+```
+
+Next, schedule and receive a payment.
+```shell
+curl -X POST \
+  http://localhost:8080/lease/d290f1ee-6c54-4b01-90e6-d701748f0853/schedule \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "paymentDate": "2017-07-22Z",
+  "paymentAmount": 25
+}'
+```
+```shell
+curl -X POST \
+  http://localhost:8080/lease/d290f1ee-6c54-4b01-90e6-d701748f0853/payment \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "paymentDate": "2017-07-23Z",
+  "paymentAmount": 25
+}'
+```
+```json
+{
+    "amountDue": 0,
+    "createdDate": "2019-03-04T16:52:54.6570655Z",
+    "events": [
+        {
+            "createdDate": "2019-03-04T16:55:22.8958666Z",
+            "effectiveDate": "2017-07-23T00:00:00+00:00",
+            "eventId": 2,
+            "eventType": "PaymentReceived"
+        },
+        {
+            "createdDate": "2019-03-04T16:53:32.8943226Z",
+            "effectiveDate": "2017-07-22T00:00:00+00:00",
+            "eventId": 1,
+            "eventType": "PaymentScheduled"
+        },
+        {
+            "createdDate": "2019-03-04T16:52:54.6570655Z",
+            "effectiveDate": "2017-07-21T00:00:00+00:00",
+            "eventId": 0,
+            "eventType": "Created"
+        }
+    ],
+    "lease": {
+        "leaseId": "d290f1ee-6c54-4b01-90e6-d701748f0853",
+        "maturityDate": "2018-07-21T00:00:00+00:00",
+        "monthlyPaymentAmount": 25,
+        "startDate": "2017-07-21T00:00:00+00:00"
+    },
+    "status": "Outstanding",
+    "totalPaid": 25,
+    "totalScheduled": 25,
+    "updatedDate": "2019-03-04T16:55:22.8958666Z"
+}
+```
+> Note that the payments are effective on the payment date.
+
+Next, let's undo the `PaymentReceived` event pretending that the
+payment never actual made it into our bank account because there was some
+operational error.
+```shell
+curl -X DELETE \
+  http://localhost:8080/lease/d290f1ee-6c54-4b01-90e6-d701748f0853/2
+```
+> `2` is the `eventId` of the `PaymentReceived` event.
+
+```json
+{
+    "amountDue": 25,
+    "createdDate": "2019-03-04T16:52:54.6570655Z",
+    "events": [
+        {
+            "createdDate": "2019-03-04T16:53:32.8943226Z",
+            "effectiveDate": "2017-07-22T00:00:00+00:00",
+            "eventId": 1,
+            "eventType": "PaymentScheduled"
+        },
+        {
+            "createdDate": "2019-03-04T16:52:54.6570655Z",
+            "effectiveDate": "2017-07-21T00:00:00+00:00",
+            "eventId": 0,
+            "eventType": "Created"
+        }
+    ],
+    "lease": {
+        "leaseId": "d290f1ee-6c54-4b01-90e6-d701748f0853",
+        "maturityDate": "2018-07-21T00:00:00+00:00",
+        "monthlyPaymentAmount": 25,
+        "startDate": "2017-07-21T00:00:00+00:00"
+    },
+    "status": "Outstanding",
+    "totalPaid": 0,
+    "totalScheduled": 25,
+    "updatedDate": "2019-03-04T16:53:32.8943226Z"
+}
+```
+> Note that the `PaymentReceived` event is no longer in the `events` array. Also,
+the `amountDue` has now gone back to `25`.
+
+Lastly, let's terminate the lease.
+```shell
+curl -X DELETE \
+  http://localhost:8080/lease/d290f1ee-6c54-4b01-90e6-d701748f0853
+```
+```json
+{
+    "amountDue": 25,
+    "createdDate": "2019-03-04T16:52:54.6570655Z",
+    "events": [
+        {
+            "createdDate": "2019-03-04T17:03:02.3684812Z",
+            "effectiveDate": "2019-03-04T17:03:02.3655135Z",
+            "eventId": 4,
+            "eventType": "Terminated"
+        },
+        {
+            "createdDate": "2019-03-04T16:53:32.8943226Z",
+            "effectiveDate": "2017-07-22T00:00:00+00:00",
+            "eventId": 1,
+            "eventType": "PaymentScheduled"
+        },
+        {
+            "createdDate": "2019-03-04T16:52:54.6570655Z",
+            "effectiveDate": "2017-07-21T00:00:00+00:00",
+            "eventId": 0,
+            "eventType": "Created"
+        }
+    ],
+    "lease": {
+        "leaseId": "d290f1ee-6c54-4b01-90e6-d701748f0853",
+        "maturityDate": "2018-07-21T00:00:00+00:00",
+        "monthlyPaymentAmount": 25,
+        "startDate": "2017-07-21T00:00:00+00:00"
+    },
+    "status": "Terminated",
+    "totalPaid": 0,
+    "totalScheduled": 25,
+    "updatedDate": "2019-03-04T17:03:02.3684812Z"
+}
+```
+> Note that now the `status` is `Terminated`.
+
+Now for the best part. If you navigate to `http://localhost:2113` and
+look at the stream `lease-d290f1ee6c544b0190e6d701748f0853` you can see all the
+events that have happened. __Especially note the `Undid` event__. This should
+make your auditors happy.
+
+![eventstore](/assets/images/bi-temporal-event-sourcing/eventstore.png)
 
 ## Summary
 In this post we covered the main functions and types used to handle a bi-temporal
