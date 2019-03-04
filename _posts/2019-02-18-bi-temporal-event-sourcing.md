@@ -387,13 +387,14 @@ curl -X POST \
 > Note that the payments are effective on the payment date.
 
 Next, let's undo the `PaymentReceived` event pretending that the
-payment never actual made it into our bank account and there was some
+payment never actual made it into our bank account because there was some
 operational error.
 ```shell
 curl -X DELETE \
   http://localhost:8080/lease/d290f1ee-6c54-4b01-90e6-d701748f0853/2
 ```
 > `2` is the `eventId` of the `PaymentReceived` event.
+
 ```json
 {
     "amountDue": 25,
@@ -424,7 +425,7 @@ curl -X DELETE \
     "updatedDate": "2019-03-04T16:53:32.8943226Z"
 }
 ```
-> Note that the `PaymentReceived` event is not longer in the `events` array. Also,
+> Note that the `PaymentReceived` event is no longer in the `events` array. Also,
 the `amountDue` has now gone back to `25`.
 
 Lastly, let's terminate the lease.
