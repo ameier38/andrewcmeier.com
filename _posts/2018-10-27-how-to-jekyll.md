@@ -4,6 +4,7 @@ title: How to Jekyll
 cover: /assets/images/how-to-jekyll/cover.png
 permalink: how-to-jekyll
 date: 2018-10-27 11:37:39 -0400
+updated: 2019-05-25 11:00:00 -0400
 categories: 
   - jekyll
   - windows
@@ -34,8 +35,8 @@ only the items necessary for this tutorial.
       ```
    4. Add extras and versions buckets.
       ```
-      > scoop add bucket extras
-      > scoop add bucket versions
+      > scoop bucket add extras
+      > scoop bucket add versions
       ```
 
 2. Install [Git](https://git-scm.com/). Git is a version-control system 
