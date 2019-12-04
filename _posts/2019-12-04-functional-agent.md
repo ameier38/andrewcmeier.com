@@ -3,10 +3,11 @@ layout: post
 title:  Functional Agent
 cover: /assets/images/functional-agent/functional-agent.png
 permalink: functional-agent
-date: 2019-04-27 07:30:00 -0400
-updated: 2019-04-27 07:30:00 -0400
+date: 2019-12-04 07:30:00 -0400
+updated: 2019-12-04 07:30:00 -0400
 categories: 
   - F#
+  - F# Advent
   - MailboxProcessor
   - Asynchronous
 comments: true
