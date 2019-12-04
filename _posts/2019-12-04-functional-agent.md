@@ -13,15 +13,44 @@ comments: true
 ---
 
 Happy F# Advent! This post demonstrates how to use
-F#'s MailboxProcessor to create agents to manage
+F#'s MailboxProcessor to create agents for managing
 asynchronous workflows. We will create _functional_
 agents in the sense that we will use functional
 programming techniques such as immutable data
 structures and `fold` functions to maintain state.
 
+## Agents
+An agent, or actor as it is sometimes called,
+is essentially a message queue which encapsulates
+instructions on how to process incoming messages. 
+
+Agents receive messages and process them in order,
+optionally maintaining some internal state.
+
+## Use Case
+In this post, we will implement a few different kinds of agents to
+handle concurrency in different ways. The motivation for these agents
+was a need to process a large amount of API requests
+in order to load data into a warehouse. The requirements were the following:
+
+1. Don't exceed the rate limit of the API.
+2. Don't exceed the memory limits of the server processing the requests.
+3. Process the requests as quickly as possible as there is a lot of data.
+
+For an example to play with, we will implement a typewriter, where each
+key press represents a request to an API, and the key info represents
+the data returned from the API. Writing each line represents writing
+the data to a file in order to batch upload to the warehouse. We will implement
+three agents to handle our requirements.
+
+1. Parallel Agent -> specify the work that is processed concurrently
+2. Rate Agent -> specify the requests per second (key presses per second)
+3. Buffer Agent -> specify the data held in memory before writing to disk (number of keys in line)
+
 ## TL;DR;
-First install [Docker](https://docs.docker.com/v17.09/engine/installation/)
-and [Docker Compose](https://docs.docker.com/compose/install/).
+To try the typewriter, first install [Docker](https://docs.docker.com/v17.09/engine/installation/)
+and [Docker Compose](https://docs.docker.com/compose/install/). Then clone the repo
+and run the typewriter.
 ```shell
 git clone https://github.com/ameier38/functional-agent.git
 cd functional-agent
@@ -37,34 +66,6 @@ file to change the parameters.
 
 > On the left you can see the rate limited typing and on the right you
 can see the the keys written to a file with max buffer (read: line) of 10 keys.
-
-## Agents
-An agent, or actor as it is sometimes called,
-is essentially a message queue which encapsulates
-instructions on how to process incoming messages. 
-
-Agents receive messages and process them sequentially,
-optionally maintaining some internal state.
-
-## Use Case
-In this post, we will implement a few different kinds of agents to
-handle concurrency in different ways. The motivation for these agents
-was a need to process a large amount of API requests
-in order to load data into a warehouse. The requirements were the following:
-
-1. Don't exceed the rate limit of the API.
-2. Don't exceed the memory limits of the server processing the requests.
-3. Process the requests as quickly as possible as there is a lot of data.
-
-For a example to play with, we will implement a typewriter, where each
-key press represents a request to an API, and the key info represents
-the data returned from the external API. Writing each line represents writing
-the data to a file in order to batch upload to the warehouse. We will implement
-three agents to handle our requirements.
-
-1. Rate Agent -> specify the requests per second (key presses per second)
-2. Buffer Agent -> specify the data held in memory before writing to disk
-3. Parallel Agent -> specify the work that is processed concurrently
 
 ## Design
 We will implement our typewriter in F# with the
@@ -88,21 +89,21 @@ First we will define our state.
 
 ```fsharp
 type ParallelAgentState =
-    { IsWaiting: bool                   // flag to track if we are done processing all work
-      WorkRequestedCount: int           // how many workflows we have requested so we can make sure we process all
-      WorkRunningCount: int             // how many workflows are currently running for logging
-      WorkCompletedCount: int           // how many workflows have completed to compare against total requested
-      WorkQueued: Queue<Async<unit>> }  // the queue of workflows to run
+    { IsWaiting: bool                   // Flag to track if we are done processing all work
+      WorkRequestedCount: int           // How many workflows we have requested so we can make sure we process all
+      WorkRunningCount: int             // How many workflows are currently running for logging
+      WorkCompletedCount: int           // How many workflows have completed to compare against total requested
+      WorkQueued: Queue<Async<unit>> }  // The queue of workflows to run
 ```
 
 Next we will define the messages that agent can receive.
 
 ```fsharp
 type ParallelAgentMessage =
-    | WorkRequested of Async<unit>      // new work to be processed
-    | WorkCompleted                     // message sent after work has finished
-    | WaitRequested                     // message sent after all work has been requested
-    | StatusRequested of AsyncReplyChannel<ParallelAgentStatus> // message sent to report status of agent state
+    | WorkRequested of Async<unit>      // New work to be processed
+    | WorkCompleted                     // Message sent after work has finished
+    | WaitRequested                     // Message sent after all work has been requested
+    | StatusRequested of AsyncReplyChannel<ParallelAgentStatus> // Message sent to report status of agent state
 ```
 
 We can then define our implementation of the `MailboxProcessor` as
@@ -119,19 +120,19 @@ let evolve (inbox:ParallelAgentMailbox)
     : ParallelAgentState -> ParallelAgentMessage -> ParallelAgentState =
     fun (state:ParallelAgentState) (msg:ParallelAgentMessage) ->
         match msg with
-        // when work is requested, increment the work requested count
+        // When work is requested, increment the work requested count
         // and add the work to the queue.
         | WorkRequested work ->
             { state with
                 WorkRequestedCount = state.WorkRequestedCount + 1
                 WorkQueued = state.WorkQueued.Conj(work) }
-        // when work is completed decrement the running work count
+        // When work is completed decrement the running work count
         // and increment the work completed count
         | WorkCompleted ->
             { state with
                 WorkRunningCount = state.WorkRunningCount - 1
                 WorkCompletedCount = state.WorkCompletedCount + 1 }
-        // when the status is requested (for logging) we use a side effect to
+        // When the status is requested (for logging) we use a side effect to
         // reply to the caller using the channel that is passed with the message
         | StatusRequested replyChannel ->
             let isComplete = state.WorkRequestedCount = state.WorkCompletedCount
@@ -146,13 +147,13 @@ let evolve (inbox:ParallelAgentMailbox)
                       WorkCompletedCount = state.WorkCompletedCount }
                 replyChannel.Reply(Running(status))
             state
-        // when a wait is requested we have finished requesting all the work
+        // When a wait is requested we have finished requesting all the work
         // and we should just update the state to indicate we are waiting for
         // all of the work to finish
         | WaitRequested -> 
             { state with
                 IsWaiting = true }
-        // see below
+        // See below
         |> tryWork inbox
 ```
 
@@ -165,9 +166,10 @@ let tryWork (inbox:ParallelAgentMailbox) (state:ParallelAgentState) =
     match state.WorkQueued with
     // If the queue is empty there is nothing to do
     | Queue.Nil -> state
-    // If the queue is not empty, process the next item in the queue
-    // in a new thread without waiting and update the state.
-    // When the work finishes we will send a `WorkCompleted` message.
+    // If the queue is not empty, and the running count is below the limit
+    // then process the next item in the queue in a new thread without 
+    // waiting and update the state. When the work finishes we will send 
+    // a `WorkCompleted` message.
     | Queue.Cons (work, remainingQueue) when state.WorkRunningCount < limit ->
         Async.Start(async {
             do! work
@@ -287,6 +289,8 @@ let tryWork (state:RateAgentState) =
                     TokenCount = tokenCount - 1
                     WorkQueued = remainingQueue }
             recurse newState
+    // If there are 'tokens' available, then process the
+    // queued work until the token count is zero
     if state.TokenCount > 0 then recurse state
     else state
 
@@ -294,10 +298,13 @@ let evolve
     : RateAgentState -> RateAgentMessage -> RateAgentState = 
     fun (state:RateAgentState) (msg:RateAgentMessage) ->
         match msg with
+        // When work is requested add the work to the queue
         | WorkRequested work -> 
             { state with
                 WorkQueued = state.WorkQueued.Conj(work) }
-        | RefillRequested -> 
+        // Increase the token count by the rate limit (tokens/second).
+        // We will request a refill once per second.
+        | RefillRequested ->
             { state with
                 TokenCount = 1<second> * rateLimit }
         | WaitRequested -> 
@@ -354,6 +361,7 @@ type RateAgent(name:string, rateLimit:PerSecond) =
             return! refill()
         }
 
+    // Start the refill in the background which will run for the life of the agent
     do Async.Start(refill())
 
     member __.LogStatus() =
@@ -371,7 +379,7 @@ type RateAgent(name:string, rateLimit:PerSecond) =
 ```
 
 The beauty of implementing the agents in this way is that the overall structure remains
-the same and we just need to focus on `evolve` function to update the state.
+the same and we just need to focus on the `evolve` function to update the state.
 
 ### Buffer Agent
 We will leave this to the reader to explore. All the code is [available on GitHub](https://github.com/ameier38/functional-agent).
@@ -412,7 +420,7 @@ type Typewriter(rateLimit:int<1/second>, parallelLimit:int, bufferSize:int, file
             bufferAgent.LogStatus()
         // any other keys send the key first to the rate agent
         // which sends it to the parallel agent which sends
-        // to the buffer agent after a delay
+        // it to the buffer agent after a delay
         | _ ->
             let work = async {
                 do! Async.Sleep(1000)
@@ -423,6 +431,10 @@ type Typewriter(rateLimit:int<1/second>, parallelLimit:int, bufferSize:int, file
                 parallelAgent.Post(work)
             )
 ```
+
+The typewriter is overly complicated but serves as a good example of
+how the agent settings can affect the process. Try changing the parameters
+and see how the typewriter performs!
 
 ## Summary
 I hope you enjoyed the post! We covered how to implement agents in a functional
